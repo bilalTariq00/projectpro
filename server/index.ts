@@ -12,39 +12,23 @@ import { sendUpcomingJobReminders, processPlanRenewalReminders } from "./service
 
 const app = express();
 
-// Enable CORS for mobile app - allow all origins for Railway deployment
+// Enable CORS for mobile app
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Allow all origins for Railway deployment
-    if (process.env.NODE_ENV === 'production') {
-      return callback(null, true);
-    }
-    
-    // For development, allow specific origins
-    const allowedOrigins = [
-      'http://localhost', 
-      'http://localhost:3000', 
-      'http://192.168.100.183:3000',
-      'http://10.103.181.15:3000',
-      'http://10.66.174.113:3000',
-      'capacitor://localhost', 
-      'ionic://localhost',
-      'http://localhost:8100',
-      'http://localhost:4200',
-      'http://localhost:8080',
-      'http://localhost:5173',
-      'http://localhost:4173'
-    ];
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    callback(new Error('Not allowed by CORS'));
-  },
+  origin: [
+    'http://localhost', 
+    'http://localhost:3000', 
+    'http://192.168.100.183:3000',
+    'http://10.103.181.15:3000',
+    'http://10.66.174.113:3000',
+    'capacitor://localhost', 
+    'ionic://localhost',
+    'http://localhost:8100',
+    'http://localhost:4200',
+    'http://localhost:8080',
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'https://projectpro-production.up.railway.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'x-mobile-session-id'],
@@ -126,16 +110,20 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database
-  await initDB();
-  
-  // Health check endpoint for Railway (register early to avoid Vite interference)
+  // Add health check endpoint before database initialization
   app.get('/api/health', (req, res) => {
     res.json({ 
       status: 'ok', 
       timestamp: new Date().toISOString(),
-      service: 'ProjectPro API'
+      service: 'ProjectPro API',
+      message: 'Backend is running'
     });
+  });
+
+  // Initialize database (non-blocking)
+  initDB().catch((error) => {
+    console.error('❌ Database initialization failed:', error);
+    // Don't crash the server, just log the error
   });
   
   // Registra l'endpoint dedicato per gli spot promozionali mobile
