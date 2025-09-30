@@ -8,8 +8,8 @@ const isMobileDevice = () => {
 };
 
 const MOBILE_API_BASE_URL = isMobileDevice() 
-  ? 'http://localhost:3000'  // Use local backend for testing
-  : 'http://localhost:3000';        // Use local backend for web browser
+  ? 'https://projectpro-production.up.railway.app'  // Use Railway backend for mobile APK (works globally)
+  : 'http://localhost:3000';        // Use local backend for web browser development
 
 
 // Global fetch interceptor to catch ALL API calls
