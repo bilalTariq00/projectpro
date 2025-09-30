@@ -984,7 +984,21 @@
         "expiration": "Scadenza",
         "unknownPlan": "Piano sconosciuto",
         "perMonth": "/ mese",
-        "perYear": "/ anno"
+        "perYear": "/ anno",
+        "planUpdated": "Piano Aggiornato",
+        "planUpdatedSuccess": "Piano aggiornato con successo",
+        "planUpdateError": "Impossibile aggiornare il piano",
+        "configurationUpdated": "Configurazione Aggiornata",
+        "configurationUpdatedSuccess": "Configurazione del piano aggiornata con successo",
+        "configurationUpdateError": "Impossibile aggiornare la configurazione del piano",
+        "selectPlan": "Seleziona Piano",
+        "billingFrequency": "Frequenza di Fatturazione",
+        "monthly": "Mensile",
+        "yearly": "Annuale",
+        "startDate": "Data di Inizio",
+        "noActiveSubscription": "Nessun abbonamento attivo",
+        "planDetails": "Dettagli Piano",
+        "client": "Cliente"
       },
       "adminEdit": {
         "title": "Informazioni Amministratore",

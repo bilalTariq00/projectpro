@@ -1893,10 +1893,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Transform numeric prices to strings if needed
       const transformedData = { ...req.body };
       if (transformedData.monthlyPrice !== undefined && transformedData.monthlyPrice !== null) {
-        transformedData.monthlyPrice = transformedData.monthlyPrice.toString();
+        transformedData.monthlyPrice = parseFloat(transformedData.monthlyPrice).toFixed(2);
       }
       if (transformedData.yearlyPrice !== undefined && transformedData.yearlyPrice !== null) {
-        transformedData.yearlyPrice = transformedData.yearlyPrice.toString();
+        transformedData.yearlyPrice = parseFloat(transformedData.yearlyPrice).toFixed(2);
       }
       
       const validatedData = insertSubscriptionPlanSchema.parse(transformedData);
@@ -1924,10 +1924,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Transform numeric prices to strings if needed
       const transformedData = { ...req.body };
       if (transformedData.monthlyPrice !== undefined && transformedData.monthlyPrice !== null) {
-        transformedData.monthlyPrice = transformedData.monthlyPrice.toString();
+        transformedData.monthlyPrice = parseFloat(transformedData.monthlyPrice).toFixed(2);
       }
       if (transformedData.yearlyPrice !== undefined && transformedData.yearlyPrice !== null) {
-        transformedData.yearlyPrice = transformedData.yearlyPrice.toString();
+        transformedData.yearlyPrice = parseFloat(transformedData.yearlyPrice).toFixed(2);
       }
       
       const validatedData = insertSubscriptionPlanSchema.partial().parse(transformedData);

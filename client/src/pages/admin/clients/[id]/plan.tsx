@@ -109,13 +109,16 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     const selectedPlan = plans.find(p => p.id === selectedPlanId);
     if (!selectedPlan) return 0;
     
+    let priceStr = "0";
     if (billingFrequency === "monthly") {
-      return selectedPlan.monthlyPrice;
+      priceStr = selectedPlan.monthlyPrice || "0";
     } else if (billingFrequency === "yearly") {
-      return selectedPlan.yearlyPrice;
+      priceStr = selectedPlan.yearlyPrice || "0";
     }
     
-    return 0;
+    // Convert string to number and ensure it's valid
+    const priceNum = parseFloat(priceStr);
+    return isNaN(priceNum) ? 0 : priceNum;
   };
   
   const endDate = calculateEndDate();
@@ -146,16 +149,16 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     },
     onSuccess: () => {
       toast({
-        title: "Operazione completata",
-        description: "Piano aggiornato con successo",
+        title: t('admin.clientPlan.planUpdated'),
+        description: t('admin.clientPlan.planUpdatedSuccess'),
         variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${clientId}/subscription`] });
     },
     onError: (error) => {
       toast({
-        title: "Errore",
-        description: "Impossibile aggiornare il piano",
+        title: t('common.error'),
+        description: t('admin.clientPlan.planUpdateError'),
         variant: "destructive",
       });
       console.error("Errore nell'aggiornare la sottoscrizione:", error);
@@ -253,16 +256,16 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     },
     onSuccess: () => {
       toast({
-        title: "Operazione completata",
-        description: "Configurazione del piano aggiornata con successo",
+        title: t('admin.clientPlan.configurationUpdated'),
+        description: t('admin.clientPlan.configurationUpdatedSuccess'),
         variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/plan-configurations?userId=${clientId}`] });
     },
     onError: (error) => {
       toast({
-        title: "Errore",
-        description: "Impossibile aggiornare la configurazione del piano",
+        title: t('common.error'),
+        description: t('admin.clientPlan.configurationUpdateError'),
         variant: "destructive",
       });
       console.error("Errore nell'aggiornare la configurazione:", error);
@@ -362,7 +365,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t('common.back')}
         </Button>
-        <h1 className="text-3xl font-bold">{t('admin.settings.clientPlan.title')}</h1>
+        <h1 className="text-3xl font-bold">{t('admin.clientPlan.title')}</h1>
       </div>
       
       {isLoading ? (
@@ -375,21 +378,21 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
           <div className="md:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>{t('admin.settings.clientPlan.title')}</CardTitle>
+                <CardTitle>{t('admin.clientPlan.title')}</CardTitle>
                 <CardDescription>
-                  {t('admin.settings.clientPlan.description')} {client?.name || "il cliente"}
+                  {t('admin.clientPlan.description')} {client?.name || "il cliente"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="plan">Piano di Abbonamento</Label>
+                    <Label htmlFor="plan">{t('admin.clientPlan.selectPlan')}</Label>
                     <Select 
                       value={selectedPlanId?.toString() || ''} 
                       onValueChange={(value) => setSelectedPlanId(Number(value))}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Seleziona un piano" />
+                        <SelectValue placeholder={t('admin.clientPlan.selectPlan')} />
                       </SelectTrigger>
                       <SelectContent>
                         {plans.map(plan => (
@@ -403,7 +406,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="billingFrequency">Frequenza di Fatturazione</Label>
+                      <Label htmlFor="billingFrequency">{t('admin.clientPlan.billingFrequency')}</Label>
                       <Select 
                         value={billingFrequency} 
                         onValueChange={(value) => setBillingFrequency(value)}
@@ -412,14 +415,14 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
                           <SelectValue placeholder="Seleziona frequenza" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="monthly">Mensile</SelectItem>
-                          <SelectItem value="yearly">Annuale</SelectItem>
+                          <SelectItem value="monthly">{t('admin.clientPlan.monthly')}</SelectItem>
+                          <SelectItem value="yearly">{t('admin.clientPlan.yearly')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="startDate">Data di Inizio</Label>
+                      <Label htmlFor="startDate">{t('admin.clientPlan.startDate')}</Label>
                       <Input 
                         id="startDate" 
                         type="date" 
@@ -430,20 +433,20 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="status">{t('admin.settings.clientPlan.subscriptionStatus')}</Label>
+                    <Label htmlFor="status">{t('admin.clientPlan.subscriptionStatus')}</Label>
                     <Select 
                       value={status} 
                       onValueChange={(value) => setStatus(value)}
                       disabled={isTrial}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={t('admin.settings.clientPlan.selectStatus')} />
+                        <SelectValue placeholder={t('admin.clientPlan.selectStatus')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="active">{t('admin.settings.clientPlan.active')}</SelectItem>
-                        <SelectItem value="pending">{t('admin.settings.clientPlan.pending')}</SelectItem>
-                        <SelectItem value="cancelled">{t('admin.settings.clientPlan.cancelled')}</SelectItem>
-                        <SelectItem value="expired">{t('admin.settings.clientPlan.expired')}</SelectItem>
+                        <SelectItem value="active">{t('admin.clientPlan.active')}</SelectItem>
+                        <SelectItem value="pending">{t('admin.clientPlan.pending')}</SelectItem>
+                        <SelectItem value="cancelled">{t('admin.clientPlan.cancelled')}</SelectItem>
+                        <SelectItem value="expired">{t('admin.clientPlan.expired')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -454,7 +457,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
                       checked={isTrial}
                       onCheckedChange={setIsTrial}
                     />
-                    <Label htmlFor="trialMode">{t('admin.settings.clientPlan.trialVersion')}</Label>
+                    <Label htmlFor="trialMode">{t('admin.clientPlan.trialVersion')}</Label>
                   </div>
                   
                   <Separator />
@@ -465,11 +468,11 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
                       disabled={!selectedPlanId || updateSubscription.isPending}
                     >
                       {updateSubscription.isPending ? (
-                        <>{t('admin.settings.clientPlan.saving')}</>
+                        <>{t('admin.clientPlan.saving')}</>
                       ) : (
                         <>
                           <Save className="mr-2 h-4 w-4" />
-                          {t('admin.settings.clientPlan.saveChanges')}
+                          {t('admin.clientPlan.saveChanges')}
                         </>
                       )}
                     </Button>
@@ -1038,24 +1041,24 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
                   {subscription ? (
                     <>
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Piano Attuale</h3>
+                        <h3 className="text-sm font-medium text-gray-500">{t('admin.clientPlan.selectedPlan')}</h3>
                         <div className="flex items-center mt-1">
                           <Badge className="mr-2" variant={subscription.status === "active" ? "default" : subscription.status === "trial" ? "secondary" : "outline"}>
                             {subscription.status === "active" && <CheckCircle className="mr-1 h-3 w-3" />}
                             {subscription.status === "trial" && <Clock className="mr-1 h-3 w-3" />}
                             {subscription.status === "cancelled" && <Ban className="mr-1 h-3 w-3" />}
-                            {subscription.status === "active" ? "Attivo" : 
-                             subscription.status === "trial" ? "Prova" :
-                             subscription.status === "cancelled" ? "Cancellato" : 
-                             subscription.status === "expired" ? "Scaduto" : 
+                            {subscription.status === "active" ? t('admin.clientPlan.active') : 
+                             subscription.status === "trial" ? t('admin.clientPlan.trialVersion') :
+                             subscription.status === "cancelled" ? t('admin.clientPlan.cancelled') : 
+                             subscription.status === "expired" ? t('admin.clientPlan.expired') : 
                              subscription.status}
                           </Badge>
-                          {plans.find(p => p.id === subscription.planId)?.name || "Piano sconosciuto"}
+                          {plans.find(p => p.id === subscription.planId)?.name || t('admin.clientPlan.unknownPlan')}
                         </div>
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Validità</h3>
+                        <h3 className="text-sm font-medium text-gray-500">{t('admin.clientPlan.expiration')}</h3>
                         <div className="mt-1">
                           <p>
                             Da: {subscription.startDate ? format(new Date(subscription.startDate), 'dd/MM/yyyy', {locale: it}) : "N/D"}
@@ -1076,17 +1079,17 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
                       </div>
                       
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Fatturazione</h3>
+                        <h3 className="text-sm font-medium text-gray-500">{t('admin.clientPlan.billingFrequency')}</h3>
                         <p className="mt-1">
-                          {subscription.billingFrequency === "monthly" ? "Mensile" : 
-                           subscription.billingFrequency === "yearly" ? "Annuale" : 
+                          {subscription.billingFrequency === "monthly" ? t('admin.clientPlan.monthly') : 
+                           subscription.billingFrequency === "yearly" ? t('admin.clientPlan.yearly') : 
                            "N/D"}
                         </p>
                       </div>
                     </>
                   ) : (
                     <div className="py-4 text-gray-500">
-                      Nessun abbonamento attivo
+                      {t('admin.clientPlan.noActiveSubscription')}
                     </div>
                   )}
                   
@@ -1094,20 +1097,20 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
                   
                   {selectedPlanId && (
                     <div className="space-y-3">
-                      <h3 className="font-medium">{t('admin.settings.clientPlan.selectedPlan')}</h3>
+                      <h3 className="font-medium">{t('admin.clientPlan.selectedPlan')}</h3>
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500">{t('admin.settings.clientPlan.name')}</h4>
-                        <p>{plans.find(p => p.id === selectedPlanId)?.name || t('admin.settings.clientPlan.unknownPlan')}</p>
+                        <h4 className="text-sm font-medium text-gray-500">{t('admin.clientPlan.name')}</h4>
+                        <p>{plans.find(p => p.id === selectedPlanId)?.name || t('admin.clientPlan.unknownPlan')}</p>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500">{t('admin.settings.clientPlan.price')}</h4>
+                        <h4 className="text-sm font-medium text-gray-500">{t('admin.clientPlan.price')}</h4>
                         <p className="font-semibold">
-                          €{(price || 0).toFixed(2)} {billingFrequency === "monthly" ? t('admin.settings.clientPlan.perMonth') : t('admin.settings.clientPlan.perYear')}
+                          €{(price || 0).toFixed(2)} {billingFrequency === "monthly" ? t('admin.clientPlan.perMonth') : t('admin.clientPlan.perYear')}
                         </p>
                       </div>
                       {endDate && (
                         <div>
-                          <h4 className="text-sm font-medium text-gray-500">{t('admin.settings.clientPlan.expiration')}</h4>
+                          <h4 className="text-sm font-medium text-gray-500">{t('admin.clientPlan.expiration')}</h4>
                           <p>{format(endDate, 'dd/MM/yyyy', {locale: it})}</p>
                         </div>
                       )}

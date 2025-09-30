@@ -8,8 +8,8 @@ const isMobileDevice = () => {
 };
 
 const MOBILE_API_BASE_URL = isMobileDevice() 
-  ? 'https://artigianofast.com'  // Use domain for mobile devices
-  : 'https://artigianofast.com';        // Use domain for web browser
+  ? 'https://projectpro-production.up.railway.app'  // Use Railway backend for mobile devices
+  : 'https://projectpro-production.up.railway.app';        // Use Railway backend for web browser
 
 
 // Global fetch interceptor to catch ALL API calls

@@ -1,4 +1,4 @@
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, ne, desc } from "drizzle-orm";
 import { initDB } from "./db";
 import {
   users,
@@ -262,10 +262,35 @@ export class MySQLStorage implements IStorage {
 
   async createActivity(activity: InsertActivity): Promise<Activity> {
     await this.ensureInitialized();
-    const result = await this.db.insert(activities).values(activity);
-    const newActivity = await this.getActivity(result.insertId);
-    if (!newActivity) throw new Error('Failed to create activity');
-    return newActivity;
+    try {
+      const result = await this.db.insert(activities).values(activity);
+      console.log('Activity insert result:', result);
+
+      // Try different ways to get the insert ID
+      let insertId;
+      if (Array.isArray(result) && result.length > 0) {
+        insertId = result[0].insertId;
+      } else if (result && typeof result === 'object' && 'insertId' in result) {
+        insertId = result.insertId;
+      } else {
+        // Fallback: get the latest created activity
+        const activitiesList = await this.db.select()
+          .from(activities)
+          .orderBy(desc(activities.id))
+          .limit(1);
+        if (activitiesList.length > 0) {
+          return activitiesList[0];
+        }
+        throw new Error('Could not retrieve created activity');
+      }
+
+      const newActivity = await this.getActivity(insertId);
+      if (!newActivity) throw new Error('Failed to create activity');
+      return newActivity;
+    } catch (error) {
+      console.error('Error in createActivity:', error);
+      throw error;
+    }
   }
 
   async updateActivity(id: number, activity: Partial<InsertActivity>): Promise<Activity | undefined> {
@@ -465,10 +490,32 @@ export class MySQLStorage implements IStorage {
 
   async createSubscriptionPlan(plan: InsertSubscriptionPlan): Promise<SubscriptionPlan> {
     await this.ensureInitialized();
-    const result = await this.db.insert(subscriptionPlans).values(plan);
-    const newPlan = await this.getSubscriptionPlan(result.insertId);
-    if (!newPlan) throw new Error('Failed to create subscription plan');
-    return newPlan;
+    try {
+      const result = await this.db.insert(subscriptionPlans).values(plan);
+      console.log('Insert result:', result);
+      
+      // Try different ways to get the insert ID
+      let insertId;
+      if (Array.isArray(result) && result.length > 0) {
+        insertId = result[0].insertId;
+      } else if (result && typeof result === 'object' && 'insertId' in result) {
+        insertId = result.insertId;
+      } else {
+        // Fallback: get the latest created plan
+        const plans = await this.db.select().from(subscriptionPlans).orderBy(desc(subscriptionPlans.id)).limit(1);
+        if (plans.length > 0) {
+          return plans[0];
+        }
+        throw new Error('Could not retrieve created plan');
+      }
+      
+      const newPlan = await this.getSubscriptionPlan(insertId);
+      if (!newPlan) throw new Error('Failed to create subscription plan');
+      return newPlan;
+    } catch (error) {
+      console.error('Error in createSubscriptionPlan:', error);
+      throw error;
+    }
   }
 
   async updateSubscriptionPlan(id: number, plan: Partial<InsertSubscriptionPlan>): Promise<SubscriptionPlan | undefined> {
@@ -503,10 +550,36 @@ export class MySQLStorage implements IStorage {
 
   async createUserSubscription(subscription: InsertUserSubscription): Promise<UserSubscription> {
     await this.ensureInitialized();
-    const result = await this.db.insert(userSubscriptions).values(subscription);
-    const newSubscription = await this.getUserSubscription(result.insertId);
-    if (!newSubscription) throw new Error('Failed to create user subscription');
-    return newSubscription;
+    try {
+      const result = await this.db.insert(userSubscriptions).values(subscription);
+      console.log('User subscription insert result:', result);
+
+      // Try different ways to get the insert ID
+      let insertId;
+      if (Array.isArray(result) && result.length > 0) {
+        insertId = result[0].insertId;
+      } else if (result && typeof result === 'object' && 'insertId' in result) {
+        insertId = result.insertId;
+      } else {
+        // Fallback: get the latest created subscription for this user
+        const subscriptions = await this.db.select()
+          .from(userSubscriptions)
+          .where(eq(userSubscriptions.userId, subscription.userId))
+          .orderBy(desc(userSubscriptions.id))
+          .limit(1);
+        if (subscriptions.length > 0) {
+          return subscriptions[0];
+        }
+        throw new Error('Could not retrieve created subscription');
+      }
+
+      const newSubscription = await this.getUserSubscription(insertId);
+      if (!newSubscription) throw new Error('Failed to create user subscription');
+      return newSubscription;
+    } catch (error) {
+      console.error('Error in createUserSubscription:', error);
+      throw error;
+    }
   }
 
   async updateUserSubscription(id: number, subscription: Partial<InsertUserSubscription>): Promise<UserSubscription | undefined> {

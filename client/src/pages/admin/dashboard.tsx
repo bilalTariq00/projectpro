@@ -440,7 +440,7 @@ export default function AdminDashboard() {
                       <Button variant="outline">{t('admin.dashboard.clientManagement.filter')}</Button>
                       <Button variant="outline">{t('admin.dashboard.clientManagement.export')}</Button>
                     </div>
-                    <Button onClick={() => handleNavigation("clients/create")}>
+                    <Button onClick={() => handleNavigation("clients")}>
                       <Plus className="mr-2 h-4 w-4" />
                       {t('admin.dashboard.clientManagement.newClient')}
                     </Button>
