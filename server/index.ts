@@ -38,7 +38,10 @@ app.use(cors({
 
 // Handle preflight requests specifically for mobile
 app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  const origin = req.headers.origin;
+  if (origin) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, x-mobile-session-id');
   res.header('Access-Control-Allow-Credentials', 'true');
