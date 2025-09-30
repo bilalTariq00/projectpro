@@ -1749,11 +1749,5 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Import MySQL storage
-import { MySQLStorage } from './mysqlStorage';
-
-// Use MySQL storage for persistence
-// For Railway deployment, use MemStorage to avoid database connection issues
-export const storage = process.env.NODE_ENV === 'production' && process.env.RAILWAY_ENVIRONMENT 
-  ? new MemStorage() // Use in-memory storage for Railway
-  : new MySQLStorage(); // Use MySQL storage for local development
+// For Railway deployment, use only MemStorage to avoid database connection issues
+export const storage = new MemStorage();
