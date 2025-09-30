@@ -38,10 +38,7 @@ app.use(cors({
 
 // Handle preflight requests specifically for mobile
 app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  if (origin) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, x-mobile-session-id');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -110,27 +107,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Add simple root route for Railway
-  app.get('/', (req, res) => {
-    res.send('🚀 ProjectPro API is running on Railway!');
-  });
-
-  // Add health check endpoint before database initialization
-  app.get('/api/health', (req, res) => {
-    res.json({ 
-      status: 'ok', 
-      timestamp: new Date().toISOString(),
-      service: 'ProjectPro API',
-      message: 'Backend is running'
-    });
-  });
-
-  // Initialize database (completely disabled for Railway deployment)
-  // TODO: Fix Railway database connection
-  // initDB().catch((error) => {
-  //   console.error('❌ Database initialization failed:', error);
-  //   // Don't crash the server, just log the error
-  // });
+  // Initialize database
+  await initDB();
   
   // Registra l'endpoint dedicato per gli spot promozionali mobile
   registerMobileSpotEndpoints(app);
@@ -168,7 +146,7 @@ app.use((req, res, next) => {
     // Local development - use server with host binding
     server.listen({
       port: Number(port),
-      host: process.env.HOST || "0.0.0.0",
+      host: process.env.HOST || "0.0.0.0", // Listen on all network interfaces for mobile app
     }, () => {
       log(`serving on port ${port} on all network interfaces`);
     });
