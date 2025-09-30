@@ -1,15 +1,17 @@
 // Mobile API utility functions
 // This ensures all mobile API calls use absolute URLs to connect to the backend server
 
-// Auto-detect environment: use localhost for web browser, IP address for mobile
+// Auto-detect environment: use localhost for web browser, Railway for mobile APK
 const isMobileDevice = () => {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
          (window as any).Capacitor?.isNative;
 };
 
+// For APK: Use Railway backend (global access)
+// For web browser: Use localhost for development
 const MOBILE_API_BASE_URL = isMobileDevice() 
-  ? 'https://projectpro-production.up.railway.app'  // Use Railway backend for mobile APK (works globally)
-  : 'http://localhost:3000';        // Use local backend for web browser development
+  ? 'https://projectpro-production.up.railway.app'  // Railway backend for APK (works on all internet)
+  : 'http://localhost:3000';        // Local backend for web browser development
 
 
 // Global fetch interceptor to catch ALL API calls

@@ -113,6 +113,15 @@ app.use((req, res, next) => {
   // Initialize database
   await initDB();
   
+  // Health check endpoint for Railway
+  app.get('/api/health', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      service: 'ProjectPro API'
+    });
+  });
+  
   // Registra l'endpoint dedicato per gli spot promozionali mobile
   registerMobileSpotEndpoints(app);
   
