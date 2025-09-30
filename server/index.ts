@@ -110,6 +110,11 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Add simple root route for Railway
+  app.get('/', (req, res) => {
+    res.send('🚀 ProjectPro API is running on Railway!');
+  });
+
   // Add health check endpoint before database initialization
   app.get('/api/health', (req, res) => {
     res.json({ 
@@ -149,15 +154,25 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Serve the app on port 3000
+  // Serve the app on Railway port
   // this serves both the API and the client.
   const port = process.env.PORT || 3000;
-  server.listen({
-    port: Number(port),
-    host: process.env.HOST || "0.0.0.0", // Listen on all network interfaces for mobile app
-  }, () => {
-    log(`serving on port ${port} on all network interfaces`);
-  });
+  
+  // Railway-compatible server startup
+  if (process.env.RAILWAY_ENVIRONMENT) {
+    // Railway deployment - use simple listen
+    app.listen(port, () => {
+      log(`🚀 Server running on Railway port ${port}`);
+    });
+  } else {
+    // Local development - use server with host binding
+    server.listen({
+      port: Number(port),
+      host: process.env.HOST || "0.0.0.0",
+    }, () => {
+      log(`serving on port ${port} on all network interfaces`);
+    });
+  }
 
   // Simple in-process scheduler for job reminders (every 15 minutes)
   setInterval(() => {
