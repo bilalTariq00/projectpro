@@ -8,8 +8,8 @@ const isMobileDevice = () => {
 };
 
 const MOBILE_API_BASE_URL = isMobileDevice() 
-  ? 'http://localhost:3000'  // Use local backend for testing
-  : 'http://localhost:3000';        // Use local backend for web browser
+  ? 'http://192.168.18.196:3000'  // Local network IP for APK (works on same WiFi)
+  : 'http://localhost:3000';        // Local backend for web browser development
 
 
 // Global fetch interceptor to catch ALL API calls

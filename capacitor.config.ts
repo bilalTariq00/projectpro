@@ -21,9 +21,10 @@ const config: CapacitorConfig = {
     },
   },
   server: {
-    androidScheme: 'https',
+    androidScheme: 'http',
     cleartext: true,
-    allowNavigation: ['*']
+    allowNavigation: ['*'],
+    url: 'http://192.168.18.196:3000'
   }
 };
 
