@@ -129,7 +129,7 @@ app.use((req, res, next) => {
   // Initialize database
   await initDB();
   
-  // Health check endpoint for Railway
+  // Health check endpoint for Railway (register early to avoid Vite interference)
   app.get('/api/health', (req, res) => {
     res.json({ 
       status: 'ok', 
