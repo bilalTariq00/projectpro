@@ -120,11 +120,12 @@ app.use((req, res, next) => {
     });
   });
 
-  // Initialize database (non-blocking)
-  initDB().catch((error) => {
-    console.error('❌ Database initialization failed:', error);
-    // Don't crash the server, just log the error
-  });
+  // Initialize database (completely disabled for Railway deployment)
+  // TODO: Fix Railway database connection
+  // initDB().catch((error) => {
+  //   console.error('❌ Database initialization failed:', error);
+  //   // Don't crash the server, just log the error
+  // });
   
   // Registra l'endpoint dedicato per gli spot promozionali mobile
   registerMobileSpotEndpoints(app);
