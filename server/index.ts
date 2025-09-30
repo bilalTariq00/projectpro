@@ -13,58 +13,32 @@ import { sendUpcomingJobReminders, processPlanRenewalReminders } from "./service
 const app = express();
 
 // Enable CORS for mobile app
-const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) return callback(null, true);
-    
-    // In production, allow all origins for mobile app compatibility
-    if (process.env.NODE_ENV === 'production') {
-      return callback(null, true);
-    }
-    
-    // In development, check against allowed origins
-    const allowedOrigins = [
-      'http://localhost', 
-      'http://localhost:3000', 
-      'http://192.168.100.183:3000',
-      'http://10.103.181.15:3000',
-      'capacitor://localhost', 
-      'ionic://localhost',
-      'http://localhost:8100',
-      'http://localhost:4200',
-      'http://localhost:8080',
-      'http://localhost:5173',
-      'http://localhost:4173'
-    ];
-    
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+app.use(cors({
+  origin: [
+    'http://localhost', 
+    'http://localhost:3000', 
+    'http://192.168.100.183:3000',
+    'http://10.103.181.15:3000',
+    'http://10.66.174.113:3000',
+    'capacitor://localhost', 
+    'ionic://localhost',
+    'http://localhost:8100',
+    'http://localhost:4200',
+    'http://localhost:8080',
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'https://projectpro-production.up.railway.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'x-mobile-session-id'],
   preflightContinue: false,
   optionsSuccessStatus: 204
-};
-
-app.use(cors(corsOptions));
+}));
 
 // Handle preflight requests specifically for mobile
 app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  
-  // In production, allow all origins
-  if (process.env.NODE_ENV === 'production') {
-    res.header('Access-Control-Allow-Origin', origin || '*');
-  } else {
-    // In development, be more restrictive
-    res.header('Access-Control-Allow-Origin', origin || '*');
-  }
-  
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, x-mobile-session-id');
   res.header('Access-Control-Allow-Credentials', 'true');
