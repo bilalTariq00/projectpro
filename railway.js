@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('🚀 ProjectPro API is running on Railway!');
+  res.send('🚀 ProjectPro API is running on Railway! (v2)');
 });
 
 app.get('/api/health', (req, res) => {
