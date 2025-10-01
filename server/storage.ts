@@ -1752,24 +1752,5 @@ export class MemStorage implements IStorage {
 // Import MySQL storage
 import { MySQLStorage } from './mysqlStorage';
 
-// Lazy initialization of storage to avoid blocking app startup
-let _storage: MySQLStorage | null = null;
-
-export const storage = {
-  get instance() {
-    if (!_storage) {
-      try {
-        _storage = new MySQLStorage();
-      } catch (error) {
-        console.error('❌ Failed to initialize storage:', error);
-        // Return a mock storage that throws errors for all operations
-        return new Proxy({}, {
-          get() {
-            throw new Error('Database not available');
-          }
-        }) as MySQLStorage;
-      }
-    }
-    return _storage;
-  }
-} as any;
+// Use MySQL storage for persistence
+export const storage = new MySQLStorage();

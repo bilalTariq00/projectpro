@@ -20,7 +20,7 @@ function getDatabaseUrl(): string {
   const password = process.env.MYSQL_PASSWORD || '';
   const database = process.env.MYSQL_DATABASE || 'railway';
 
-  return `mysql://${user}:${password}@${host}:${port}/${database}?ssl=false&acquireTimeout=${process.env.DB_ACQUIRE_TIMEOUT || 30000}&timeout=${process.env.DB_TIMEOUT || 30000}&connectionTimeout=${process.env.DB_CONNECTION_TIMEOUT || 30000}`;
+  return `mysql://${user}:${password}@${host}:${port}/${database}?ssl=false`;
 }
 
 export async function initDB() {
