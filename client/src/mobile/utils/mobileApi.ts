@@ -8,8 +8,8 @@ const isMobileDevice = () => {
 };
 
 const MOBILE_API_BASE_URL = isMobileDevice() 
-  ? 'https://projectpro-production.up.railway.app'  // Use Railway backend for mobile devices
-  : 'https://projectpro-production.up.railway.app';        // Use Railway backend for web browser
+  ? 'https://project-pro-sandy.vercel.app'  // Use Vercel backend for mobile devices
+  : 'https://project-pro-sandy.vercel.app';        // Use Vercel backend for web browser
 
 
 // Global fetch interceptor to catch ALL API calls
