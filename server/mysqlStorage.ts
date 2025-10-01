@@ -57,7 +57,7 @@ export class MySQLStorage implements IStorage {
   private initialized: boolean = false;
 
   constructor() {
-    this.initializeDB();
+    // Don't initialize DB immediately - wait for first use
   }
 
   private async initializeDB() {
