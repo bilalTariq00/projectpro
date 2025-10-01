@@ -1749,5 +1749,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-// For Railway deployment, use only MemStorage to avoid database connection issues
-export const storage = new MemStorage();
+// Import MySQL storage
+import { MySQLStorage } from './mysqlStorage';
+
+// Use MySQL storage for persistence
+export const storage = new MySQLStorage();

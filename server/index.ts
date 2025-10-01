@@ -107,8 +107,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database
-  await initDB();
+  // Initialize database (with graceful failure handling)
+  try {
+    await initDB();
+  } catch (error) {
+    console.error('❌ Database initialization failed, but server will continue:', error);
+    // Continue without database - some endpoints may not work
+  }
   
   // Registra l'endpoint dedicato per gli spot promozionali mobile
   registerMobileSpotEndpoints(app);
