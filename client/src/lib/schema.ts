@@ -172,3 +172,36 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertClient = z.infer<typeof insertClientSchema>;
 export type InsertJob = z.infer<typeof insertJobSchema>;
 export type InsertPromotionalSpot = z.infer<typeof insertPromotionalSpotSchema>;
+
+// Add WebPage schema for frontend forms
+export const insertWebPageSchema = z.object({
+  title: z.string().min(1),
+  slug: z.string().min(1),
+  content: z.string().min(1),
+  type: z.string().default("desktop"),
+  status: z.string().default("draft"),
+  featuredImage: z.string().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  authorId: z.number(),
+  isHomepage: z.boolean().default(false),
+  sortOrder: z.number().default(0),
+});
+
+export type WebPage = {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  type: string;
+  status: string;
+  featuredImage?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt?: Date;
+  authorId: number;
+  isHomepage: boolean;
+  sortOrder: number;
+};
