@@ -146,6 +146,29 @@ export const insertJobSchema = z.object({
   assignedUserId: z.number().optional(),
 });
 
+export const insertPromotionalSpotSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().optional(),
+  redirectUrl: z.string().optional(),
+  enableRedirect: z.boolean().default(false),
+  images: z.string().optional(),
+  textAnimationType: z.string().default("fixed"),
+  imageDisplayType: z.string().default("single"),
+  status: z.string().default("inactive"),
+  timeRanges: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  dailyFrequency: z.number().default(1),
+  weeklySchedule: z.string().optional(),
+  visiblePages: z.string().default('all'),
+  position: z.string(),
+  width: z.number().optional(),
+  height: z.number().optional(),
+  displayDuration: z.number().default(10),
+  displayInterval: z.number().default(0),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertClient = z.infer<typeof insertClientSchema>;
 export type InsertJob = z.infer<typeof insertJobSchema>;
+export type InsertPromotionalSpot = z.infer<typeof insertPromotionalSpotSchema>;

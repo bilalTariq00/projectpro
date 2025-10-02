@@ -23,7 +23,7 @@ import {
 } from "../../components/ui/table";
 import { Link, useLocation } from "wouter";
 import { ArrowLeft, Plus, Pencil, Trash2, Home } from "lucide-react";
-import { SubscriptionPlan } from "@shared/schema";
+import { SubscriptionPlan } from "../lib/schema";
 import { useTranslation } from "react-i18next";
 
 // Schema per la validazione del form

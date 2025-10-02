@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { PromotionalSpot } from '@shared/schema';
+import { PromotionalSpot } from '../../lib/schema';
 import { X } from 'lucide-react';
 import { useLocation } from 'wouter';
 

@@ -3,7 +3,7 @@ import PromoSpotList from "./PromoSpotList";
 import PromoSpotForm from "./PromoSpotForm";
 import { Button } from "../../components/ui/button";
 import { Plus } from "lucide-react";
-import type { PromotionalSpot } from "@shared/schema";
+import type { PromotionalSpot } from "../../lib/schema";
 
 export default function PromoSpotPage() {
   const [view, setView] = useState<'list' | 'form'>('list');
