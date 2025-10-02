@@ -4,15 +4,19 @@ import session from "express-session";
 import MemoryStore from "memorystore";
 import cors from "cors";
 import multer from "multer";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
-import { registerMobileSpotEndpoints } from "./api-spots";
-import { initDB } from "./db";
-import { sendUpcomingJobReminders, processPlanRenewalReminders } from "./services/notifications";
+import { registerRoutes } from "./routes.js";
+import { registerMobileSpotEndpoints } from "./api-spots.js";
+import { initDB } from "./db.js";
+import { sendUpcomingJobReminders, processPlanRenewalReminders } from "./services/notifications.js";
 
 const app = express();
 
-// Enable CORS for mobile app
+// Simple logging function
+function log(message: string) {
+  console.log(`[${new Date().toISOString()}] ${message}`);
+}
+
+// Enable CORS for mobile app and frontend
 app.use(cors({
   origin: [
     'http://localhost', 
@@ -36,7 +40,7 @@ app.use(cors({
   optionsSuccessStatus: 204
 }));
 
-// Handle preflight requests specifically for mobile
+// Handle preflight requests
 app.options('*', (req, res) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
@@ -48,34 +52,34 @@ app.options('*', (req, res) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
-// Configure multer for handling multipart/form-data
+// Configure multer
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
+    fileSize: 50 * 1024 * 1024,
   },
 });
 
-// Add multer middleware for multipart/form-data
 app.use(upload.any());
 
-// Setup session middleware
+// Setup session
 const SessionStore = MemoryStore(session);
 app.use(session({
   secret: process.env.SESSION_SECRET || "artisan-project-manager-secret-key",
   resave: false,
   saveUninitialized: false,
   store: new SessionStore({
-    checkPeriod: 86400000 // prune expired entries every 24h
+    checkPeriod: 86400000
   }),
   cookie: { 
-    secure: false, // Allow HTTP for mobile app development
+    secure: false,
     httpOnly: true,
-    sameSite: 'lax', // Allow cross-origin requests from mobile app
-    maxAge: 86400000 // 24 hours
+    sameSite: 'lax',
+    maxAge: 86400000
   }
 }));
 
+// Request logging
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -94,11 +98,9 @@ app.use((req, res, next) => {
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-
       log(logLine);
     }
   });
@@ -107,63 +109,45 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database (with graceful failure handling)
   try {
+    // Initialize database
     await initDB();
-  } catch (error) {
-    console.error('❌ Database initialization failed, but server will continue:', error);
-    // Continue without database - some endpoints may not work
-  }
-  
-  // Registra l'endpoint dedicato per gli spot promozionali mobile
-  registerMobileSpotEndpoints(app);
-  
-  const server = await registerRoutes(app);
+    log('Database initialized successfully');
+    
+    // Register mobile spot endpoints
+    registerMobileSpotEndpoints(app);
+    
+    // Register all other routes
+    const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
-  // Serve the app on Railway port
-  // this serves both the API and the client.
-  const port = process.env.PORT || 3000;
-  
-  // Railway-compatible server startup
-  if (process.env.RAILWAY_ENVIRONMENT) {
-    // Railway deployment - use simple listen
-    app.listen(port, () => {
-      log(`🚀 Server running on Railway port ${port}`);
+    // Error handler
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      res.status(status).json({ message });
+      console.error(err);
     });
-  } else {
-    // Local development - use server with host binding
+
+    // Start server
+    const port = process.env.PORT || 3000;
     server.listen({
       port: Number(port),
-      host: process.env.HOST || "0.0.0.0", // Listen on all network interfaces for mobile app
+      host: process.env.HOST || "0.0.0.0",
     }, () => {
-      log(`serving on port ${port} on all network interfaces`);
+      log(`Server running on port ${port} on all network interfaces`);
     });
+
+    // Job reminders every 15 minutes
+    setInterval(() => {
+      sendUpcomingJobReminders().catch((e) => log(`Reminder job failed: ${String(e)}`));
+    }, 15 * 60 * 1000);
+
+    // Plan renewal reminders once per day
+    setInterval(() => {
+      processPlanRenewalReminders(7).catch((e) => log(`Renewal reminders failed: ${String(e)}`));
+    }, 24 * 60 * 60 * 1000);
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   }
-
-  // Simple in-process scheduler for job reminders (every 15 minutes)
-  setInterval(() => {
-    sendUpcomingJobReminders().catch((e) => log(`reminder job failed: ${String(e)}`, "notifications"));
-  }, 15 * 60 * 1000);
-
-  // Plan renewal reminders once per day
-  setInterval(() => {
-    processPlanRenewalReminders(7).catch((e) => log(`renewal reminders failed: ${String(e)}`, "notifications"));
-  }, 24 * 60 * 60 * 1000);
 })();

@@ -1,5 +1,5 @@
-import { storage } from '../storage';
-import { PlanFeatures } from './planEnforcement';
+import { storage } from '../storage.js';
+import { PlanFeatures } from './planEnforcement.js';
 
 // Type definitions for database entities
 interface User {

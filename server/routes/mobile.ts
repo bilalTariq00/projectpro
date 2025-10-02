@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { storage } from "../storage";
+import { storage } from "../storage.js";
 import * as bcrypt from 'bcrypt';
 
 // Declare global mobile sessions storage
@@ -18,7 +18,7 @@ import {
   checkFeatureLimit,
   filterResponseByPlan,
   addPlanInfo 
-} from "../middleware/planEnforcement";
+} from "../middleware/planEnforcement.js";
 
 const router = Router();
 
@@ -256,7 +256,7 @@ router.post("/login", async (req: Request, res: Response) => {
     
     // Log plan permissions for this user
     try {
-      const { PlanEnforcementService } = await import('../services/planEnforcement');
+      const { PlanEnforcementService } = await import('../services/planEnforcement.js');
       const planConfig = await PlanEnforcementService.getUserPlanConfiguration(user.id);
       const permissions = planConfig?.features?.permissions || {};
       console.log("✅ Permissions for user login:", {
@@ -480,7 +480,7 @@ router.put("/jobs/:id", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Check if user has permission to edit jobs
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const planConfig = await PlanEnforcementService.getUserPlanConfiguration(userId);
     
     // Check job edit permission
@@ -527,7 +527,7 @@ router.delete("/jobs/:id", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Check if user has permission to delete jobs
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const planConfig = await PlanEnforcementService.getUserPlanConfiguration(userId);
     
     // Check job delete permission
@@ -1157,7 +1157,7 @@ router.get("/permissions/activity-management", async (req: Request, res: Respons
     const userId = global.mobileSessions[mobileSessionId];
     
     // Check if activity management is enabled for this user's plan
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const activityManagementEnabled = await PlanEnforcementService.isActivityManagementEnabled(userId);
     
     res.json({
@@ -1617,7 +1617,7 @@ router.post("/collaborators", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Check if user has permission to create collaborators
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const canCreateCollaborators = await PlanEnforcementService.hasPermission(userId, 'collaborator.create');
     if (!canCreateCollaborators) {
       return res.status(403).json({ 
@@ -1647,7 +1647,7 @@ router.patch("/collaborators/:id", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Check if user has permission to edit collaborators
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const canEditCollaborators = await PlanEnforcementService.hasPermission(userId, 'collaborator.edit');
     if (!canEditCollaborators) {
       return res.status(403).json({ 
@@ -1683,7 +1683,7 @@ router.delete("/collaborators/:id", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Check if user has permission to delete collaborators
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const canDeleteCollaborators = await PlanEnforcementService.hasPermission(userId, 'collaborator.delete');
     if (!canDeleteCollaborators) {
       return res.status(403).json({ 
@@ -1720,7 +1720,7 @@ router.get("/all-jobs", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
     
     // Get user's plan configuration for permissions and feature visibility
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     // Enforce job.view_all via deny-by-default
     const canViewAllJobs = await PlanEnforcementService.hasPermission(userId, 'job.view_all');
     const jobs = canViewAllJobs
@@ -1776,7 +1776,7 @@ router.post("/jobs", async (req: Request, res: Response) => {
     
     // Check permission to create jobs
     console.log("🔍 Checking job creation permission...");
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const hasPermission = await PlanEnforcementService.hasPermission(userId, 'job.create');
     console.log(`🔍 Job creation permission check: userId=${userId}, permission=job.create, hasPermission=${hasPermission}`);
     if (!hasPermission) {
@@ -1833,7 +1833,7 @@ router.patch("/jobs/:id", async (req: Request, res: Response) => {
     (req.session as any).userId = userId;
     
     // Check permission to edit jobs
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const hasPermission = await PlanEnforcementService.hasPermission(userId, 'job.edit');
     if (!hasPermission) {
       return res.status(403).json({ error: "Non hai il permesso di modificare i lavori" });
@@ -1868,7 +1868,7 @@ router.post("/jobs/:id/complete", async (req: Request, res: Response) => {
     (req.session as any).userId = userId;
     
     // Check permission to complete jobs
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const hasPermission = await PlanEnforcementService.hasPermission(userId, 'job.complete');
     if (!hasPermission) {
       return res.status(403).json({ error: "Non hai il permesso di completare i lavori" });
@@ -1910,7 +1910,7 @@ router.get("/all-clients", async (req: Request, res: Response) => {
     const clients = await storage.getClients();
     
     // Get user's plan configuration for feature visibility
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const planConfig = await PlanEnforcementService.getUserPlanConfiguration(userId);
     
     // Filter client fields based on plan configuration
@@ -1952,7 +1952,7 @@ router.post("/clients", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Check if user has permission to create clients
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     // Check client creation permission via deny-by-default
     const canCreateClients = await PlanEnforcementService.hasPermission(userId, 'client.create');
     if (!canCreateClients) {
@@ -1983,7 +1983,7 @@ router.patch("/clients/:id", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Check if user has permission to edit clients
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const canEditClients = await PlanEnforcementService.hasPermission(userId, 'client.edit');
     if (!canEditClients) {
       return res.status(403).json({ 
@@ -2015,7 +2015,7 @@ router.put("/clients/:id", async (req: Request, res: Response) => {
     }
 
     const userId = global.mobileSessions[mobileSessionId];
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const canEditClients = await PlanEnforcementService.hasPermission(userId, 'client.edit');
     if (!canEditClients) {
       return res.status(403).json({ 
@@ -2049,7 +2049,7 @@ router.delete("/clients/:id", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Check if user has permission to delete clients
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const canDeleteClients = await PlanEnforcementService.hasPermission(userId, 'client.delete');
     if (!canDeleteClients) {
       return res.status(403).json({ 
@@ -2084,7 +2084,7 @@ router.get("/plan-configuration", async (req: Request, res: Response) => {
     const userId = global.mobileSessions[mobileSessionId];
 
     // Get user's plan configuration
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const planConfig = await PlanEnforcementService.getUserPlanConfiguration(userId);
     
     if (!planConfig) {
@@ -2168,7 +2168,7 @@ router.get("/permissions", async (req: Request, res: Response) => {
     }
 
     // Get user's plan configuration for field visibility
-    const { PlanEnforcementService } = await import('../services/planEnforcement');
+    const { PlanEnforcementService } = await import('../services/planEnforcement.js');
     const planConfig = await PlanEnforcementService.getUserPlanConfiguration(userId);
     
     if (process.env.DEBUG_PERMISSIONS) console.log('🔍 Plan Config Debug:', {

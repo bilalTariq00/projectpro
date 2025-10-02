@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { storage } from "../../storage";
-import { insertPromotionalSpotSchema } from "../../../shared/schema";
+import { storage } from "../../storage.js";
+import { insertPromotionalSpotSchema } from "../../../shared/schema.js";
 import { z } from "zod";
 
 const router = Router();

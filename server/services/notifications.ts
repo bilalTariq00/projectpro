@@ -1,6 +1,6 @@
-import { storage } from "../storage";
+import { storage } from "../storage.js";
 import { log } from "../vite";
-import type { Client, Collaborator, Job } from "@shared/schema";
+import type { Client, Collaborator, Job } from "../../shared/schema.js";
 
 type EmailPayload = {
   to: string;

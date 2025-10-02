@@ -1,5 +1,5 @@
 import { Router } from "express";
-import promotionalSpotsRouter from "./promotional-spots";
+import promotionalSpotsRouter from "./promotional-spots.js";
 
 const router = Router();
 

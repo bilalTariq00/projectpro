@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { PlanEnforcementService } from '../services/planEnforcement';
+import { PlanEnforcementService } from '../services/planEnforcement.js';
 
 /**
  * Middleware to check if a feature is enabled for the user

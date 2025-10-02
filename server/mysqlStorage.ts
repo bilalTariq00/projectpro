@@ -1,5 +1,5 @@
 import { and, eq, ne, desc } from "drizzle-orm";
-import { initDB } from "./db";
+import { initDB } from "./db.js";
 import {
   users,
   clients,
@@ -49,15 +49,15 @@ import {
   PromotionalSpot,
   InsertGeneralSettings,
   GeneralSettings
-} from "../shared/schema";
-import { IStorage } from "./storage";
+} from "../shared/schema.js";
+import { IStorage } from "./storage.js";
 
 export class MySQLStorage implements IStorage {
   private db: any;
   private initialized: boolean = false;
 
   constructor() {
-    // Don't initialize DB immediately - wait for first use
+    this.initializeDB();
   }
 
   private async initializeDB() {
@@ -810,10 +810,22 @@ export class MySQLStorage implements IStorage {
       return { 
         id, 
         ...newSettings,
-        appName: newSettings.appName || "ProjectPro",
+        appName: newSettings.appName || "Project Management",
         defaultLanguage: newSettings.defaultLanguage || "it",
-        enableEmailNotifications: newSettings.enableEmailNotifications ?? null,
-        enableWhatsAppNotifications: newSettings.enableWhatsAppNotifications ?? null
+        enableEmailNotifications: newSettings.enableEmailNotifications ?? true,
+        enableWhatsAppNotifications: newSettings.enableWhatsAppNotifications ?? false,
+        defaultNotificationTime: newSettings.defaultNotificationTime ?? 24,
+        dateFormat: newSettings.dateFormat || "DD/MM/YYYY",
+        timeFormat: newSettings.timeFormat || "24h",
+        timezone: newSettings.timezone || "Europe/Rome",
+        weekStartsOn: newSettings.weekStartsOn || "monday",
+        sessionTimeout: newSettings.sessionTimeout ?? 60,
+        passwordMinLength: newSettings.passwordMinLength ?? 8,
+        passwordRequireNumbers: newSettings.passwordRequireNumbers ?? true,
+        passwordRequireSpecialChars: newSettings.passwordRequireSpecialChars ?? true,
+        defaultPageSize: newSettings.defaultPageSize ?? 10,
+        maxUploadFileSize: newSettings.maxUploadFileSize ?? 10,
+        allowedFileTypes: newSettings.allowedFileTypes || "jpg,jpeg,png,pdf,doc,docx,xls,xlsx"
       };
     }
   }

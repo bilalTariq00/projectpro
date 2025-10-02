@@ -1,5 +1,5 @@
 import { and, eq, ne } from "drizzle-orm";
-import { db } from "./db";
+import { db } from "./db.js";
 import {
   users,
   clients,
@@ -49,7 +49,7 @@ import {
   PromotionalSpot,
   InsertGeneralSettings,
   GeneralSettings
-} from "../shared/schema";
+} from "../shared/schema.js";
 
 export interface IStorage {
   // User methods
@@ -1750,7 +1750,7 @@ export class MemStorage implements IStorage {
 }
 
 // Import MySQL storage
-import { MySQLStorage } from './mysqlStorage';
+import { MySQLStorage } from './mysqlStorage.js';
 
 // Use MySQL storage for persistence
 export const storage = new MySQLStorage();

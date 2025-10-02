@@ -14,15 +14,15 @@ declare module 'express-session' {
     };
   }
 }
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import { log } from "./vite";
 import mysql from "mysql2/promise";
-import mobileRoutes from "./routes/mobile";
-import { initDB } from "./db";
-import { users, jobs, clients, jobTypes, userSubscriptions, subscriptionPlans } from "../shared/schema";
-import { planConfigurations } from "../shared/schema-simple";
+import mobileRoutes from "./routes/mobile.js";
+import { initDB } from "./db.js";
+import { users, jobs, clients, jobTypes, userSubscriptions, subscriptionPlans } from "../shared/schema.js";
+import { planConfigurations } from "../shared/schema-simple.js";
 import { eq } from "drizzle-orm";
-import adminRoutes from "./routes/admin";
+import adminRoutes from "./routes/admin/index.js";
 import { 
   insertClientSchema, 
   insertJobSchema, 
@@ -37,7 +37,7 @@ import {
   insertWebPageSchema,
   insertPlanConfigurationSchema,
   insertGeneralSettingsSchema
-} from "@shared/schema";
+} from "../shared/schema.js";
 import crypto from "crypto";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
@@ -390,7 +390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has permission to edit clients
       const userId = (req.session as any).userId;
       if (userId) {
-        const { PlanEnforcementService } = await import('./services/planEnforcement');
+        const { PlanEnforcementService } = await import('./services/planEnforcement.js');
         const planConfig = await PlanEnforcementService.getUserPlanConfiguration(userId);
         
         // Check client edit permission
@@ -425,7 +425,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has permission to delete clients
       const userId = (req.session as any).userId;
       if (userId) {
-        const { PlanEnforcementService } = await import('./services/planEnforcement');
+        const { PlanEnforcementService } = await import('./services/planEnforcement.js');
         const planConfig = await PlanEnforcementService.getUserPlanConfiguration(userId);
         
         // Check client delete permission
@@ -643,7 +643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const baseUrl = process.env.APP_PUBLIC_URL || "http://localhost:3000";
         const activationUrl = `${baseUrl}/activate?token=${activationToken}`;
-        const { notifyCollaboratorActivation } = await import("./services/notifications");
+        const { notifyCollaboratorActivation } = await import("./services/notifications.js");
         await notifyCollaboratorActivation(newCollaborator as any, activationUrl);
       } catch (e) {
         log(`Failed to send collaborator activation: ${String(e)}`, "notifications");
@@ -734,7 +734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Fire-and-forget notifications
       (async () => {
         try {
-          const { notifyJobCreated } = await import("./services/notifications");
+          const { notifyJobCreated } = await import("./services/notifications.js");
           await notifyJobCreated(newJob as any, client as any);
         } catch (e) {
           log(`Failed to send job created notifications: ${String(e)}`, "notifications");
@@ -781,7 +781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DEV: trigger reminder jobs manually
   app.post("/api/dev/run-job-reminders", async (_req: Request, res: Response) => {
     try {
-      const { sendUpcomingJobReminders } = await import("./services/notifications");
+      const { sendUpcomingJobReminders } = await import("./services/notifications.js");
       const count = await sendUpcomingJobReminders();
       return res.json({ sent: count });
     } catch (e) {
@@ -792,7 +792,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/dev/run-renewal-reminders", async (_req: Request, res: Response) => {
     try {
-      const { processPlanRenewalReminders } = await import("./services/notifications");
+      const { processPlanRenewalReminders } = await import("./services/notifications.js");
       const count = await processPlanRenewalReminders(7);
       return res.json({ sent: count });
     } catch (e) {
@@ -3619,7 +3619,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = global.mobileSessions[mobileSessionId];
       
       // Check if user has permission to register activities
-      const { PlanEnforcementService } = await import('./services/planEnforcement');
+      const { PlanEnforcementService } = await import('./services/planEnforcement.js');
       const planConfig = await PlanEnforcementService.getUserPlanConfiguration(userId);
       
       const canRegisterActivities = planConfig?.features?.permissions?.['activity.register'] !== false;
@@ -3946,7 +3946,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           revenueGrowth
         },
         byPeriod: [], // Would need time-based grouping
-        byJobType: Object.entries(byJobType).map(([type, data]) => ({
+        byJobType: Object.entries(byJobType).map(([type, data]: [string, { revenue: number; count: number }]) => ({
           type,
           revenue: data.revenue,
           count: data.count
@@ -4020,7 +4020,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           onTimeCompletion: Math.round(onTimeCompletion)
         },
         byPeriod: [], // Would need time-based grouping
-        byJobType: Object.entries(byJobType).map(([type, data]) => ({
+        byJobType: Object.entries(byJobType).map(([type, data]: [string, { planned: number; actual: number; count: number }]) => ({
           type,
           planned: data.planned,
           actual: data.actual,
@@ -4095,7 +4095,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           qualityIndex: Math.round(qualityIndex * 10) / 10,
           trend: 0 // Would need historical data
         },
-        byJobType: Object.entries(byJobType).map(([type, data]) => ({
+        byJobType: Object.entries(byJobType).map(([type, data]: [string, { efficiency: number; count: number }]) => ({
           type,
           efficiency: data.efficiency,
           count: data.count

@@ -1,5 +1,5 @@
-import { MySQLStorage } from './mysqlStorage';
-import { MemStorage } from './storage';
+import { MySQLStorage } from './mysqlStorage.js';
+import { MemStorage } from './storage.js';
 
 async function migrateData() {
   console.log('🚀 Starting data migration from MemStorage to MySQL...');

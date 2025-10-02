@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { storage } from "../../storage";
+import { storage } from "../../storage.js";
 
 const router = Router();
 
@@ -61,7 +61,7 @@ router.get("/", async (req, res) => {
       
       // Se è una stringa singola, convertila in array
       if (typeof spot.images === 'string') {
-        const imagesArray = spot.images.split(',').map(img => img.trim());
+        const imagesArray = spot.images.split(',').map((img: string) => img.trim());
         return { ...spot, images: imagesArray };
       }
       
