@@ -14,7 +14,6 @@ import { mobileApiCall } from "./utils/mobileApi";
 import MobileWelcome from "./pages/Welcome";
 import MobileLogin from "./pages/Login";
 import MobileSignup from "./pages/Signup";
-import TestCapacitor from "./pages/TestCapacitor";
 import MobileSubscriptionPlans from "./pages/SubscriptionPlans";
 import MobileCheckout from "./pages/Checkout";
 import MobileActivate from "./pages/Activate";
@@ -199,7 +198,6 @@ export default function MobileApp() {
             <Switch>
               <Route path="/mobile/login" component={MobileLogin} />
               <Route path="/mobile/signup" component={MobileSignup} />
-              <Route path="/mobile/test-capacitor" component={TestCapacitor} />
               <Route path="/mobile/plans" component={MobileSubscriptionPlans} />
               <Route path="/mobile/subscription-plans" component={MobileSubscriptionPlans} />
               <Route path="/mobile/checkout/:planId?/:billingType?" component={MobileCheckout} />
