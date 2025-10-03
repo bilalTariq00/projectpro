@@ -8,6 +8,7 @@ import { registerRoutes } from "./routes.js";
 import { registerMobileSpotEndpoints } from "./api-spots.js";
 import { initDB } from "./db.js";
 import { sendUpcomingJobReminders, processPlanRenewalReminders } from "./services/notifications.js";
+import { serveStatic, setupVite } from "./vite.js";
 
 const app = express();
 
@@ -119,6 +120,18 @@ app.use((req, res, next) => {
     
     // Register all other routes
     const server = await registerRoutes(app);
+
+    // Health check endpoint for platform readiness probes
+    app.get('/api/health', (_req, res) => {
+      res.json({ status: 'ok' });
+    });
+
+    // Setup static file serving
+    if (process.env.NODE_ENV === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
 
     // Error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
