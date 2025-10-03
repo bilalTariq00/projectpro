@@ -32,7 +32,9 @@ app.use(cors({
     'http://localhost:8080',
     'http://localhost:5173',
     'http://localhost:4173',
-    'https://projectpro-production.up.railway.app'
+    'https://projectpro-production.up.railway.app',
+    'https://project-pro-server.up.railway.app'
+    , 'https://project-pro-qep9.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
