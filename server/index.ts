@@ -32,7 +32,7 @@ app.use(cors({
     'http://localhost:8080',
     'http://localhost:5173',
     'http://localhost:4173',
-    'https://projectpro-production.up.railway.app',
+    // 'https://projectpro-production.up.railway.app',
     'https://project-pro-server.up.railway.app'
     , 'https://project-pro-qep9.vercel.app'
   ],
@@ -129,11 +129,7 @@ app.use((req, res, next) => {
     });
 
     // Setup static file serving
-    if (process.env.NODE_ENV === "development") {
-      await setupVite(app, server);
-    } else {
-      serveStatic(app);
-    }
+    serveStatic(app);
 
     // Error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

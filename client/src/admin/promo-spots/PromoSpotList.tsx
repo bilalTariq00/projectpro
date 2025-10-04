@@ -10,7 +10,7 @@ import { Pencil, Trash2, Plus, Eye, EyeOff } from "lucide-react";
 import { apiRequest } from "../../lib/queryClient";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import type { PromotionalSpot } from "../../lib/schema";
+import type { PromotionalSpot } from "@shared/schema";
 
 interface PromoSpotListProps {
   onEdit: (spot: PromotionalSpot) => void;

@@ -18,11 +18,12 @@ export async function setupVite(app: any, server: any) {
   // Vite setup for development
   const { createServer } = await import('vite');
   const vite = await createServer({
+    root: join(__dirname, '..', 'client'),
     server: { middlewareMode: true },
     appType: 'custom'
   });
   
-  app.use(vite.ssrLoadModule);
+  app.use(vite.middlewares);
   return vite;
 }
 
